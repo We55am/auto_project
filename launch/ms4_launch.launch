@@ -17,13 +17,14 @@
 
   <node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf" args="-urdf -model turtlebot3_$(arg model) -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -param robot_description" />
 
-  <node pkg="auto_project" name="Lyapunov" type="Lyapunov.py">
+  <node pkg="auto_project" type="Lyapunov.py" name="Lyapunov">
     <param name="K_x" value="0.5" />   
     <param name="K_theta" value="1" />
     <param name="Vd_des" value="0.001" />   
     <param name="Omega_des" value="0" />
   </node>
 
+  <node pkg="auto_project" type="Odom_Check.py" name="odom_check"/>
   
    
 </launch>
