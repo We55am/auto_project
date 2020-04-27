@@ -96,7 +96,7 @@ def callback_Act_Pos(data):
   position = [pos_msg.position.x,pos_msg.position.y,pos_msg.position.z,yaw, pitch, roll]
   flag_cont = 1
 
-sub1 = rospy.Subscriber('/odom', Odometry, callback_Act_Pos) #Identify the subscriber "sub2" to subscribe topic "/turtle1/pose" of type "Pose"
+sub1 = rospy.Subscriber('/odom_kf', Odometry, callback_Act_Pos) #Identify the subscriber "sub2" to subscribe topic "/turtle1/pose" of type "Pose"
 #######################################################################
 
 #######################################################################
