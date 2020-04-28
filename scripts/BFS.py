@@ -126,7 +126,7 @@ if __name__=='__main__':
 ##    Subscriber Initialization
     pos_msg = Pose()
     vel_msg = Twist()
-    sub1 = rospy.Subscriber('/odom', Odometry, callback)
+    #sub1 = rospy.Subscriber('/odom', Odometry, callback)
     init_flag = True
     while init_flag:
         pass
