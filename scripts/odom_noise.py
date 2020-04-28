@@ -246,31 +246,3 @@ while 1 and not rospy.is_shutdown():
 ###################################################################################################################################################################
 
 
-
-
-
-
-
-
-
-#Plotting of signals from sensor and noisy signals
- plt.figure(1)
- line_1 = plt.plot(X, 'r-', label='X-Pos')
- line_2 = plt.plot(XNoisy, 'b-', label='X-Noisy')
- plt.legend()
-
-
- plt.figure(2)
- line_1 = plt.plot(Y, 'r-', label='Y-Pos')
- line_2 = plt.plot(YNoisy, 'b-', label='Y-Noisy')
- plt.legend()
-
-
- plt.figure(4)
- line_1 = plt.plot(Theta, 'r-', label='Theta')
- line_2 = plt.plot(ThetaNoisy, 'b-', label='Theta-Noisy')
- plt.legend()
-
- plt.show(block=True)
-
-
