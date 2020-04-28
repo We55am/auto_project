@@ -20,5 +20,20 @@
   <node pkg="auto_project" type="odom_noise.py" name="Odometry_Check"/>
 
   <node pkg="auto_project" type="kalman_filter.py" name="KalmanFilter"/>
+  
+  <node pkg="auto_project" type="Lyapunov.py" name="Lyapunov">
+    <param name="K_x" value="0.5" />   
+    <param name="K_theta" value="1" />
+    <param name="Vd_des" value="0.001" />   
+    <param name="Omega_des" value="0" />
+  </node>
+  
+  <node pkg="auto_project" name="Odometry_Plot" type="odom_noise.py" output="screen" launch-prefix="xterm -e">
+    <param name="xstd" value="0.1" />   
+    <param name="ystd" value="0.1" />
+    <param name="thetastd" value="0.1" />   
+  </node>
+  
+  <node pkg="auto_project" type="rqt_graph" name="rqt_graph"/>
    
 </launch>
