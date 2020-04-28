@@ -130,7 +130,7 @@ def callback(data):
 	  Time = msg.header.stamp.to_sec() 	#Extract the time of the simulation
 	  flag_cont = 1				#Set flag to one
 
-sub2 = rospy.Subscriber('/odom', Odometry, callback) #Identify the subscriber "sub2" to subscribe topic "/odom" of type "Odometry"
+sub2 = rospy.Subscriber('/odom_noisy', Odometry, callback) #Identify the subscriber "sub2" to subscribe topic "/odom" of type "Odometry"
 ####################################################################################################################################################################
 
 ####################################################################################################################################################################
