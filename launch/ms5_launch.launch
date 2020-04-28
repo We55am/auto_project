@@ -29,6 +29,6 @@
   <node pkg="auto_project" type="kalman_filter.py" name="KalmanFilter"/>
  
   
-  <node pkg="auto_project" name="rqt_graph" type="rqt_graph"/>
+  <node pkg="rqt_graph" name="rqt_graph" type="rqt_graph"/>
    
 </launch>
