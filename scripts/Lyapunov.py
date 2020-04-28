@@ -127,7 +127,7 @@ def callback_Act_Pos_Init(data):
   flag_initial = 1
   sub2.unregister()				#Unsubsribe from this topic
 
-sub2 = rospy.Subscriber('/odom', Odometry, callback_Act_Pos_Init) #Identify the subscriber "sub1" to subscribe topic "/turtle1/pose" of type "Pose"
+sub2 = rospy.Subscriber('/odom_kf', Odometry, callback_Act_Pos_Init) #Identify the subscriber "sub1" to subscribe topic "/turtle1/pose" of type "Pose"
 #######################################################################
 #######################################################################
 ##Stop code here till subscribe the first msg of the vehicle position
