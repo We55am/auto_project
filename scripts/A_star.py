@@ -157,7 +157,7 @@ if __name__=='__main__':
 ##    Subscriber Initialization
     pos_msg = Pose()
     vel_msg = Twist()
-    sub1 = rospy.Subscriber('/odom', Odometry, callback)
+    #sub1 = rospy.Subscriber('/odom', Odometry, callback)
     rospy.loginfo("The node is created !!")
 ##    Map Image Setups
     img_real = cv2.imread('./new_MAP.png', 0)
