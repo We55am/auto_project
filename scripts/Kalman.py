@@ -22,8 +22,8 @@ rospy.init_node('Kalman_Filter', anonymous = True) #Identify Ros Node
 ####################################################################################################################################################################
 ####################################################################################################################################################################
 ## ROS Publisher Code
-pub1 = rospy.Publisher('/odom_kf', Odometry, queue_size=10) #Identify the publisher "pub1" to publish on topic "/Odom_Values" to send message of type "Odometry"
-odom_kf = Odometry() #Identify msg variable of data type Odometry
+pub1 = rospy.Publisher('/cmd_vel', Twist, queue_size=10) #Identify the publisher "pub1" to publish on topic "/Odom_Values" to send message of type "Odometry"
+Control_Input = Twist() #Identify msg variable of data type Odometry
 rate = rospy.Rate(10) # rate of publishing msg 10hz
 ####################################################################################################################################################################
 ####################################################################################################################################################################
@@ -144,7 +144,6 @@ velocity_0 = np.zeros((1,6))  #Identify array of six elements all initialized by
 Time_0 = 0
 ####################################################################################################################################################################
 
-
 ####################################################################################################################################################################
 ####################################################################################################################################################################
 #Initial callback function for setting the vehicle initial position
@@ -190,11 +189,8 @@ def callback_Init(data):
 sub1 = rospy.Subscriber('/odom_noisy', Odometry, callback_Init) #Identify the subscriber "sub1" to subscribe topic "/odom" of type "Odometry"
 ####################################################################################################################################################################
 ####################################################################################################################################################################
-controller_vel = Twist()
-def cmd_listen(data):
-    global controller_vel
-    controller_vel = data
-sub3 = rospy.Subscriber('/cmd_vel', Twist, cmd_listen)
+
+
 ####################################################################################################################################################################
 ####################################################################################################################################################################
 ##Stop code here till subscribe the first msg of the vehicle position
@@ -217,7 +213,7 @@ def kf_prediction(Xprev,Pprev, A, Q, B, U):
 ####################################################################################################################################################################
 ####################################################################################################################################################################
 ## Correction stage in Kalman filter
-def kf_correction(Xpredicted, Ppredicted, C, Z, R):
+def kf_correction(Xpredicted, Ppredicted, C, Z, R):			
     CTrans = np.transpose(C)				
     num = np.matmul(Ppredicted, CTrans)		##Numerature of Kalman gain equation
     den1 = np.matmul(C, Ppredicted) 		##CMatrix * PMatrix
@@ -225,11 +221,9 @@ def kf_correction(Xpredicted, Ppredicted, C, Z, R):
     den = np.matrix(den2)  			##Place denemrature in matrix form  
     deninv = den.getI()				##(CMatrix * PMatrix * CMatrix^T _+ R) Inverse 	
     KGain = np.matmul(num, deninv) 		##Calculate the Kalman gain
-##    print 'Gain'
-##    print KGain
-##    print 'xfiltered'
+    print("KG" + str(KGain))
+
     Xfiltered = Xpredicted + np.matmul(KGain, (Z - np.matmul(C, Xpredicted))) 	##Estimated updated state vector
-##    print Xfiltered
     Pfiltered = Ppredicted - np.matmul(KGain, np.matmul(C, Ppredicted)) 	##Estimated updated error co-variance matrix
     return (Xfiltered, Pfiltered)
 ####################################################################################################################################################################
@@ -242,35 +236,106 @@ Q = [[0.01,0,0],[0,0.01,0],[0,0,0.01]]		        ##Process noise matrix Q (3x3)
 R = 0.1						##Measurement noise matrix R (1x1)
 
 X = [[-1],[1],[0]]				##Initial state X (3x1)
-U = [controller_vel.linear.x, controller_vel.angular.z]
+U = [0.3, 0.8]
 A = [[1,0,0],[0,1,0],[0,0,1]]			##State transition matrix A (3x3)
 B = [[0.1,0],[0,0],[0,0.1]]            		##Input matrix B (3x2)
 C = [[1,0,0], [0,1,0], [0,0,1]]					##Measurement matrix C (1x3)
-Z = [[position[0],position[1],position[3]]]
-##print Z
-(Xpredicted, Ppredicted) = kf_prediction(X, P, A, Q, B, U)
-(Xfiltered, Pfiltered) = kf_correction(Xpredicted, Ppredicted, C, Z, R)
-####################################################################################################################################################################
+Z = [[position[0],position[1],position[3]]]					##Measurement matrix C (1x3)
+
 iterations = 50
 i = 0
+####################################################################################################################################################################
+
 while 1 and not rospy.is_shutdown():
-    B = [[0.1*position[2],0],[0.1*position[2],0],[0,0.1]]
-    U = [controller_vel.linear.x, controller_vel.angular.z]
-    for i in range(10):
-        X = Xfiltered
-        P = Pfiltered
-        Z = [[position[0],position[1],position[3]]]
-        (Xpredicted, Ppredicted) = kf_prediction(X, P, A, Q, B, U)
-        (Xfiltered, Pfiltered) = kf_correction(Xpredicted, Ppredicted, C, Z, R)
-    odom_kf.pose.pose = pos_msg
-    odom_kf.twist.twist = Velocity_msg
-    odom_kf.pose.pose.position.x = Xpredicted.item(0)
-    odom_kf.pose.pose.position.y = Xpredicted.item(1)
-    odom_kf.pose.pose.position.z = 0
-    (x, y, z, w) = tf.transformations.quaternion_from_euler(0, 0, Xpredicted.item(2))
-    odom_kf.pose.pose.orientation.x = round(x,4)
-    odom_kf.pose.pose.orientation.y = round(y,4)
-    odom_kf.pose.pose.orientation.z = round(z,4)
-    odom_kf.pose.pose.orientation.w = round(w,4)
-    pub1.publish(odom_kf)
-    rate.sleep()
+        B = [[0.1*math.cos(position[2]), 0], [0.1*math.sin(position[2]), 0], [0, 0.1]]
+	if i < iterations:
+		if flag_initial == 1:
+			##Get the initial states
+			x_p = -1										
+			y_p = 1
+			theta_p = 0
+		        
+                        ##Get the time in seconds
+			t = Time_0
+
+			X = [[x_p],[y_p],[theta_p]] 	##Set the states of the system
+			Z = x_p 			##Set the sensor reading for the x position of the robot
+
+			(Xpredicted, Ppredicted) = kf_prediction(X, P, A, Q, B, U)			##Get the predicted states
+			(Xfiltered, Pfiltered) = kf_correction(Xpredicted, Ppredicted, C, Z , R)	##Get the corrected states
+			flag_initial = 0
+
+		if flag_cont == 1:
+			##Get the initial states
+			x_p = position[0]
+			y_p = position[1]
+			theta_p = position[3]
+
+			Z = x_p		##Set the sensor reading for the x position of the robot
+
+			t = Time	##Get the time in seconds
+
+			X = Xfiltered	##Update the states with the filtered states
+			P = Pfiltered	##Update the error co-variance matrix
+
+			(Xpredicted, Ppredicted) = kf_prediction(X, P, A, Q, B, U)			##Get the predicted states
+			(Xfiltered, Pfiltered) = kf_correction(Xpredicted, Ppredicted, C, Z, R)		##Get the corrected states
+			flag_cont = 0
+	
+		XModel.append(Xpredicted.item(0)) 	#Array to hold value of x obtained by the sensor
+		YModel.append(Xpredicted.item(1)) 	#Array to hold value of y obtained by the sensor
+		ThetaModel.append(Xpredicted.item(2)) 	#Array to hold value of theta obtained by the sensor
+        	
+		XNoisy.append(x_p) 			#Array to hold noisy value of x coordinates
+		YNoisy.append(y_p) 			#Array to hold noisy value of y coordinates
+		ThetaNoisy.append(theta_p)		#Array to hold noisy value of theta coordinates
+
+		XFiltered.append(Xfiltered.item(0)) 	#Array to hold Filtered value of x coordinates
+		YFiltered.append(Xfiltered.item(1))	#Array to hold Filtered value of y coordinates
+		ThetaFiltered.append(Xfiltered.item(2)) #Array to hold Filtered value of theta coordinates
+
+		TimeTotal.append(t)
+
+		Control_Input.linear.x = 0.3
+		Control_Input.linear.y = 0
+		Control_Input.linear.z = 0
+		Control_Input.angular.x = 0
+		Control_Input.angular.y = 0
+		Control_Input.angular.z = 0.8
+		pub1.publish(Control_Input)
+        	rate.sleep()
+
+	else:
+        	Control_Input.linear.x  = 0
+		Control_Input.angular.z = 0
+		pub1.publish(Control_Input)
+        	rospy.signal_shutdown("for plotting")
+        i=i+1
+        
+#####################################################################################################################################################################
+#####################################################################################################################################################################
+##Plotting of signals from sensor and noisy signals
+plt.figure(1)
+line_1 = plt.plot(XModel, 'r-', label='X-Model')
+line_2 = plt.plot(XNoisy, 'b-', label='X-Noisy')
+line_3 = plt.plot(XFiltered, 'g-', label='X-Filtered')
+plt.legend()
+
+
+plt.figure(2)
+line_1 = plt.plot(YModel, 'r-', label='Y-Model')
+line_2 = plt.plot(YNoisy, 'b-', label='Y-Noisy')
+line_3 = plt.plot(YFiltered, 'g-', label='Y-Filtered')
+plt.legend()
+
+plt.figure(3)
+line_1 = plt.plot(ThetaModel, 'r-', label='Theta-Model')
+line_2 = plt.plot(ThetaNoisy, 'b-', label='Theta-Noisy')
+line_3 = plt.plot(ThetaFiltered, 'g-', label='Theta-Filtered')
+plt.legend()
+
+
+plt.show(block=True)
+####################################################################################################################################################################
+####################################################################################################################################################################
+
