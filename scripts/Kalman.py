@@ -22,7 +22,7 @@ rospy.init_node('Kalman_Filter', anonymous = True) #Identify Ros Node
 ####################################################################################################################################################################
 ####################################################################################################################################################################
 ## ROS Publisher Code
-pub1 = rospy.Publisher('/cmd_vel', Twist, queue_size=10) #Identify the publisher "pub1" to publish on topic "/Odom_Values" to send message of type "Odometry"
+pub1 = rospy.Publisher('/odom_kf', Twist, queue_size=10) #Identify the publisher "pub1" to publish on topic "/Odom_Values" to send message of type "Odometry"
 Control_Input = Twist() #Identify msg variable of data type Odometry
 rate = rospy.Rate(10) # rate of publishing msg 10hz
 ####################################################################################################################################################################
