@@ -266,3 +266,25 @@ while 1 and not rospy.is_shutdown():
     pub1.publish(vel_msg)	#Publish msg
     rate.sleep()		#Sleep with rate
 #########################################################################################################
+##Plotting of signals from sensor and noisy signals
+plt.figure(1)
+line_1 = plt.plot(XModel, 'r-', label='X-Model')
+line_2 = plt.plot(XNoisy, 'b-', label='X-Noisy')
+line_3 = plt.plot(XFiltered, 'g-', label='X-Filtered')
+plt.legend()
+
+
+plt.figure(2)
+line_1 = plt.plot(YModel, 'r-', label='Y-Model')
+line_2 = plt.plot(YNoisy, 'b-', label='Y-Noisy')
+line_3 = plt.plot(YFiltered, 'g-', label='Y-Filtered')
+plt.legend()
+
+plt.figure(3)
+line_1 = plt.plot(ThetaModel, 'r-', label='Theta-Model')
+line_2 = plt.plot(ThetaNoisy, 'b-', label='Theta-Noisy')
+line_3 = plt.plot(ThetaFiltered, 'g-', label='Theta-Filtered')
+plt.legend()
+
+
+plt.show(block=True)
