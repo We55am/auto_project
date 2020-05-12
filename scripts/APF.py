@@ -88,7 +88,7 @@ def callback(data):
   velocity = [Velocity_msg.linear.x,Velocity_msg.linear.y,Velocity_msg.linear.z,Velocity_msg.angular.x,Velocity_msg.angular.y,Velocity_msg.angular.z]
   flag_cont = 1
 
-sub2 = rospy.Subscriber('/odom', Odometry, callback) #Identify the subscriber "sub2" to subscribe topic "/odom" of type "Odometry"
+sub2 = rospy.Subscriber('/odom_kf', Odometry, callback) #Identify the subscriber "sub2" to subscribe topic "/odom" of type "Odometry"
 #######################################################################
 
 #######################################################################
@@ -130,7 +130,7 @@ def callback_Init(data):
   flag_initial = 1
   sub1.unregister()				#Unsubsribe from this topic
 
-sub1 = rospy.Subscriber('/odom', Odometry, callback_Init) #Identify the subscriber "sub1" to subscribe topic "/odom" of type "Odometry"
+sub1 = rospy.Subscriber('/odom_kf', Odometry, callback_Init) #Identify the subscriber "sub1" to subscribe topic "/odom" of type "Odometry"
 #######################################################################
 #######################################################################
 ##Stop code here till subscribe the first msg of the vehicle position
